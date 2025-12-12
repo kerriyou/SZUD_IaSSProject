@@ -1,0 +1,48 @@
+name: Auto-Build Windows Release
+
+# Ovu akciju pokreće svako kreiranje novog taga (npr. v1.0.0, v1.1)
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Podrzava tagove u formatu vX.Y.Z
+
+jobs:
+  build-and-release:
+    # Izvršava se na najnovijoj Windows mašini sa MinGW kompajlerom
+    runs-on: windows-latest
+    
+    steps:
+    - name: Preuzmi kod (Checkout)
+      uses: actions/checkout@v4
+
+    - name: Kompajliranje C++ koda (g++)
+      # Koristimo MinGW kompajler (g++) koji je dostupan na Windows runneru.
+      # Zastavice -static-libgcc i -static-libstdc++ obezbeđuju da .exe radi 
+      # na bilo kojoj Windows mašini bez dodatnih DLL fajlova.
+      run: g++ main.cpp -o IaasSimulator.exe -static-libgcc -static-libstdc++
+      shell: bash
+
+    - name: Postavljanje taga za Release
+      id: set_tag
+      run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Kreiranje GitHub Release-a i Upload fajla
+      # Koristi softprops/action-gh-release za automatsko kreiranje izdanja
+      uses: softprops/action-gh-release@v2
+      with:
+        # Ime taga se preuzima iz GITHUB_REF, npr. v1.0.0
+        tag_name: ${{ steps.set_tag.outputs.RELEASE_TAG }}
+        name: IaaS Simulator ${{ steps.set_tag.outputs.RELEASE_TAG }} (Windows)
+        body: |
+          Automatski kompajlirana Windows izvršna datoteka (.exe) za IaaS Simulator.
+          
+          Izvršni fajl: IaasSimulator.exe
+        # Navodimo koji fajl treba da se okači na Release
+        files: |
+          IaasSimulator.exe
+        draft: false # Postavi na 'true' ako želite ručno da pregledate Release pre objavljivanja
+        prerelease: false
+      env:
+        # GITHUB_TOKEN se automatski daje od strane GitHub Actions
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
