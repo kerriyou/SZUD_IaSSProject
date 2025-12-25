@@ -96,9 +96,9 @@ public:
 //////////////////////////////////////////////////////////
 class VM { 
 private:
-    string ime; bool radi = false; string ip = "Nema"; Skladiste* disk = nullptr;
+    string ime; bool radi = false; string ip = "Nema"; Skladiste* disk = nullptr; int ramMemorija;
 public:
-    VM(string n) : ime(n) {}
+    VM(string n) : ime(n), ramMemorija(r) {}
     string uzmiIme() const { return ime; }
     string uzmiIP() const { return ip; }
     bool daLiRadi() const { return radi; } 
@@ -127,6 +127,7 @@ public:
     void ukloniIP() { ip = "Nema"; }
 
     void informacije() const {
+        cout << "\n=== VM INFO: " << ime << " (" << ramMemorija << "GB RAM) ===\n";
         cout << "\n=== VM INFO: " << ime << " ===\n";
         cout << "Status: " << (radi ? "Radi" : "Stop") << "\n";
         cout << "IP adresa: " << ip << "\n";
@@ -147,7 +148,7 @@ public:
     }
 
     VM* kreirajVM(string n) {
-        auto v = new VM(n); vmVek.push_back(v);
+        auto v = new VM(n, 4); vmVek.push_back(v);
         cout << "[Oblak] Kreirana VM: " << n << "\n"; return v;
     }
 
