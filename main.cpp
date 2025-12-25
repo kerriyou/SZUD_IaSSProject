@@ -69,7 +69,7 @@ class Mreza {
 private:
     map<string, bool> korisceneIP;
 public:
-    Mreza() { for (int i = 10; i < 20; i++) korisceneIP["192.168.1." + to_string(i)] = false; }
+    Mreza() { for (int i = 10; i < 50; i++) korisceneIP["192.168.1." + to_string(i)] = false; }
     
     string dodeliIP() {
         for (auto& par : korisceneIP)
